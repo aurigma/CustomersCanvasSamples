@@ -1,0 +1,76 @@
+html {
+    font-size: 14px;
+}
+
+body {
+    margin: 0;
+}
+
+.header {
+    padding: .85rem 1.42rem;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: .07rem solid #E0E0E0;
+}
+
+.header__logo {
+    width: 12.14rem;
+    height: 2.14rem;
+}
+
+.header__button {
+    padding: .7rem;
+    background: #30C2FF;
+    border-radius: .21rem;
+    border: none;
+    font-family: Roboto;
+    font-style: normal;
+    font-weight: bold;
+    line-height: 1.14rem;
+    font-size: 1rem;
+    text-align: center;
+    cursor: pointer;
+    color: #FFFFFF;
+}
+
+.header__button:hover {
+    background: #2BAFE6;
+}
+
+.header__button:focus {
+    background: #2BAFE6;
+    outline: none;
+}
+
+.header__button:disabled {
+    background: #DCDEDF;
+}
+
+.main {
+    padding: 1.429rem;
+}
+
+.main__section-iframe {}
+
+.main__iframe {
+    height: calc(100% - 8rem);
+    width: 100%;
+}
+
+.main__iframe iframe {
+    border: none;
+    height: 100%;
+    width: 100%;
+}
+
+@media (max-width:450px) {
+    html {
+        font-size: 4.375vw;
+    }
+    .header {
+        padding: .85rem .714rem;
+    }
+    .main {
+        padding: 1.429rem .714rem;
+    }
+}
