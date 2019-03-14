@@ -4,12 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <script type="text/javascript" id="CcIframeApiScript"
-        src="https://localhost:4501/Resources/SPEditor/Scripts/IFrame/IframeApi.js"></script>
-    <link rel="stylesheet" href="./assets/demo.css">
-    <title>Demo-CC</title>
-    <!-- START JSON SECTION -->
+
+    <!-- INSERT CUSTOMER'S CANVAS URL HERE! -->
+    <!-- To the base URL of your CC instance add /Resources/SPEditor/Scripts/IFrame/IFrameApi.js -->
+    <script type="text/javascript" id="CcIframeApiScript" src="https://192.168.137.10/cc/4.4.1/Resources/SPEditor/Scripts/IFrame/IframeApi.js"></script>
+    <!-- -->
+
+    <link rel="stylesheet" href="../assets/demo.css">
+    <title>Test - Customer's Canvas</title>
     <script>
+        // Set the definition of a design - templates, mockups, etc.
         const product = {
             "surfaces": [
                 {
@@ -29,34 +33,38 @@
             ]
         };
 
+        // Set the editor configuration (mainly, user interface settings).
         const config = {
             "fontList": {
                 "appFonts": [
                     "*"
                 ]
             },
+            "restoreProductOnReloadEnabled": false,
+            "defaultAssetSelectWidget": "AssetManager",
+            "assetSources": {
+                "My files": {
+                    "type": "PrivateSource",
+                    "allowedExtensions": ["jpg", "jpeg", "png", "pdf"]
+                }
+            },
             "autoLoadUserInfo": true,
             "userInfo": {
                 "Image": "public:samples/test-page/Image.jpg"
+            },
+            "canvas": {
+                "shadowEnabled": false
             },
             "widgets": {
                 "ObjectInspector": {
                     "position": "Right"
                 },
-                "GalleryDialog": {
-                    "tabs": [
-                        {
-                            "name": "My Files",
-                            "type": "user",
-                            "translationKey": "GalleryDialog.TAB_USER",
-                            "canEdit": true,
-                            "canUpload": true,
-                            "actionMode": {
-                                "psd": "design",
-                                "svg": "vector"
-                            }
-                        }
-                    ]
+                "AssetManager": {
+                    "tabs": [{
+                        "name": "My files",
+                        "assetSourceInstance": "My files",
+                        "iconClassName": "cc-icon-uploadable"
+                    }]
                 },
                 "FinishButton": {
                     "mode": "Disabled"
@@ -64,57 +72,55 @@
             }
         };
     </script>
-    <!-- END JSON SECTION -->
 </head>
 
 <body>
     <header class="header">
         <div class="header__section header__section-logo">
-            <img class="header__logo" src="./assets/logo.svg" alt="logo">
+            <a href="https://customerscanvas.com" target="_blank"><img class="header__logo" src="../assets/logo.svg"
+                    alt="logo"></a>
         </div>
         <div class="header__section header__section-button">
-            <button class="header__button" id="finish">Download PDF</button>
+            <button class="header__button" disabled id="finish">Download PDF</button>
         </div>
     </header>
     <main class="main">
         <div class="main__section main__section-iframe">
             <div class="main__iframe">
                 <iframe id="editorFrame"></iframe>
+                <div id="version-box" class="main__version">ver. </div>
             </div>
         </div>
     </main>
 
     <script type="text/ecmascript">
-        document.addEventListener('DOMContentLoaded', function () {
-            function downloadPdf(hiresLink) {
-                let link = document.createElement("a");
-                link.style = "position:absolute; top:-99999999; left:-9999999; visibility:hidden";
-                link.download = 'download.pdf';
-                link.href = hiresLink;
-                document.body.appendChild(link);
-                link.click();
-            };
-            function loadProduct(product, config) {
+        document.addEventListener('DOMContentLoaded', async () => {
 
-                var editor = null;
+            document.getElementById("version-box").innerText = "version " + CustomersCanvas.VERSION;
 
-                CustomersCanvas.IframeApi.loadEditor(document.getElementById("editorFrame"), product, config, function () {
-                }).then(function (e) {
-                    editor = e;
-                }).catch(console.error.bind(console));
+            // Customer's Canvas is loaded with this line. See the JSON objects above for params.
+            var editor = await CustomersCanvas.IframeApi.loadEditor(
+                document.getElementById("editorFrame"), product, config);
 
-                document.getElementById('finish').addEventListener('click', () => {
-                    editor.finishProductDesign()
-                        .then(function (result) {
-                            downloadPdf(result.hiResOutputUrls[0]);
-                        })
-                        .catch(function (error) {
-                            console.error(error);
-                        });
-                });
-            };
-            loadProduct(product, config);
+            document.getElementById("finish").removeAttribute("disabled");
+            document.getElementById('finish').addEventListener('click', async () => {
+                let result = await editor.finishProductDesign();
+                download(result.hiResOutputUrls[0]);
+            });
         });
+
+        // A helper function to download the URL
+        // https://stackoverflow.com/a/49917066/4173445
+        function download(url) {
+            let link = document.createElement("a");
+            link.style = "position:absolute; top:-99999999; left:-9999999; visibility:hidden";
+            link.download = 'printfile.pdf';
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
     </script>
 
 </body>
