@@ -65,9 +65,8 @@ body {
 }
 
 .main__version {
-    position: absolute;
-    bottom: 8px;
-    right: 1.429rem;
+    text-align: end;
+    margin-top: .5rem;
     color: #2BAFE6;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 10px;
