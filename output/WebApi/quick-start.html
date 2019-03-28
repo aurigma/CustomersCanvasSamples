@@ -1,0 +1,127 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../assets/demo.css" />
+    <title>Quick start</title>
+    <meta name="description" content="A simple example of Web API usage" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__section header__section-logo"><a href="https://customerscanvas.com" target="_blank"><img class="header__logo" src="../assets/logo.svg" alt="logo" /></a></div>
+        <div class="header__section header__section-button"><button class="header__button" id="finish" disabled="disabled">Download PDF</button></div>
+    </header>
+    <main class="main">
+        <!-- See this article for details: 
+https://customerscanvas.com/docs/cc/web-api-for-rendering.htm
+--><img id="preview" />
+        <div id="message"></div>
+        <div id="securityError" style="display:none">
+            <h2>HTTP 403 Error</h2>
+            <div>Most likely it is caused by one of two reasons:</div>
+            <ul>
+                <li>Requests are done through HTTP, not HTTPS</li>
+                <li>No security key is provided or it is not the same as in Customer's Canvas settings</li>
+            </ul>
+            <div> You can address both issues by editing the <a href="https://customerscanvas.com/docs/cc/authsettings-config.htm">AuthSettings.config </a>file . </div>
+            <div id="moreInfo"></div>
+        </div>
+    </main>
+    <script src="../assets/helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const baseUrl = "https://192.168.137.10/cc/5.0-beta/";
+            const apiKey = "CustomerSecurityKey";
+            console.warn("IMPORTANT! Expose API Key on a client only on dev machine. For a production version, you should change your code for server-to-server requests only or turn off authorization in AuthSettings.config file.");
+            // Preview image settings
+            const previewOptions = {
+                width: 800,
+                height: 800,
+                resizeMode: "fit",
+                proofImageRendering: {
+                    fileFormat: "jpg",
+                    showStubContent: true
+                }
+            };
+
+            // Hi-res print file settings
+            const printFileOptions = {
+                RenderProofImages: false,
+                renderingConfig: {
+                    hiResOutputToSeparateFiles: false,
+                    defaultHiResOuputRendering: {
+                        fileFormat: "pdf",
+                        dpi: 300
+                    }
+                }
+            };
+            let items = {
+                "First Name": {
+                    text: "Danny"
+                },
+                "Last Name": {
+                    text: "Waldman"
+                },
+                "Photo": {
+                    "image": "public:samples/photos/02.jpg",
+                    "contentResizeMode": "Fill"
+                }
+            };
+
+            let templateData = {
+                surfaces: [
+                    "samples/name-photo"
+                ]
+            };
+            const previewRequestBody = {
+                previewOptions: previewOptions,
+                productDefinitions: [templateData],
+                itemsData: items
+            }
+
+            const printfileRequestBody = {
+                hiResOptions: previewOptions,
+                productDefinitions: [templateData],
+                itemsData: items
+            }
+            const RequestToApi = async (url, body) => {
+                let response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CustomersCanvasApiKey": apiKey ? apiKey : ""
+                    },
+                    body: JSON.stringify(body)
+                });
+                if (!response.ok) throw response;
+                return response.json();
+            }
+
+            try {
+                document.getElementById("finish").removeAttribute("disabled");
+                document.getElementById('finish').addEventListener('click', async () => {
+                    let response = await RequestToApi(`${baseUrl}api/HiRes/GenerateHiRes`, printfileRequestBody);
+                    console.log("GenerateHiRes returned this structure: ", response);
+                    download(response[0].HiResUrls[0]);
+                });
+
+                let response = await RequestToApi(`${baseUrl}api/Preview/GeneratePreview`, previewRequestBody);
+                document.getElementById("preview").src = response[0][0][0];
+
+            } catch (serverResponse) {
+                let error = await serverResponse.text();
+                if (serverResponse.status == 403) {
+                    document.getElementById("securityError").style.display = "block";
+                    document.getElementById("moreInfo").innerText = `Additional info: ${error}`;
+                } else {
+                    document.getElementById("message").innerText = error;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

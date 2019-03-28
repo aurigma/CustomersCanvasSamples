@@ -1,0 +1,35 @@
+extends master-page
+block append HEAD_CONTENT
+    //
+    // INSERT CUSTOMER'S CANVAS URL HERE!
+    <!-- To the base URL of your CC instance add #{settings.customersCanvas.iframeApiLocation} -->
+    script(type="text/javascript" id="CcIframeApiScript" src= settings.customersCanvas.baseUrl+settings.customersCanvas.iframeApiLocation) 
+    
+    // 
+
+block ACTION_BUTTONS
+    include includes/download-button
+
+block BODY_CONTENT
+    div.main__section.main__section-iframe
+        div.main__iframe
+            iframe#editorFrame
+    div.main__section.main__section-version
+        div#version-box.main__version.
+            ver. 
+
+block SCRIPT_LOADED 
+    .
+        document.getElementById("version-box").innerText = "version " + CustomersCanvas.VERSION;
+
+        // Customer's Canvas is loaded with this line. See the JSON objects above for params.
+        var editor = await CustomersCanvas.IframeApi.loadEditor(
+            document.getElementById("editorFrame"), product, config);
+
+        document.getElementById("finish").removeAttribute("disabled");
+        document.getElementById('finish').addEventListener('click', async () => {
+            let result = await editor.finishProductDesign();
+            console.log("finishProductDesign returned this structure: ", result);
+            download(result.hiResOutputUrls[0]);
+        });
+

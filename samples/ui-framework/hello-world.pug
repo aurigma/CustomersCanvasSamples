@@ -1,0 +1,25 @@
+extends ../../layouts/ui-framework
+
+block append CONFIG
+    . 
+
+        // This is just a minimal "Hello World" configuration of UI Framework. 
+        // See the configs folder for more examples of configs. 
+        const config = {
+            "showSteps": false,
+            "widgets": [
+                {
+                    "name": "text",
+                    "type": "static-text",
+                    "params": {
+                        "text": "Hello world"
+                    }
+                }
+            ],
+            "steps": [
+                {
+                    "name": "main",
+                    "mainPanel": { "name": "text" }
+                }
+            ]
+        }

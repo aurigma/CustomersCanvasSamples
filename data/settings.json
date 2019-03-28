@@ -1,0 +1,11 @@
+{
+    "customersCanvas": {
+        "baseUrl": "https://192.168.137.10/cc/5.0-beta/",
+        "iframeApiLocation": "Resources/Generated/IframeApi.js",
+        "apiKey": "CustomerSecurityKey"
+    },
+    "uiFramework": {
+        "editorLoaderUrl": "https://cdn.jsdelivr.net/npm/@aurigma/ui-framework/dist/editor",
+        "ecommerceDriverUrl": "https://cdn.jsdelivr.net/npm/@aurigma/ui-framework/dist/driver"
+    }
+}

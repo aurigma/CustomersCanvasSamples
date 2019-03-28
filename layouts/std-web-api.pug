@@ -1,0 +1,57 @@
+extends web-api
+
+block ACTION_BUTTONS
+    include includes/download-button
+
+
+block append SCRIPT_WEBAPI_INIT
+    . 
+
+        // Preview image settings
+        const previewOptions = {
+            width: 800,
+            height: 800,
+            resizeMode: "fit",
+            proofImageRendering: {
+                fileFormat: "jpg",
+                showStubContent: true
+            }
+        };
+
+        // Hi-res print file settings
+        const printFileOptions = {
+            RenderProofImages: false,
+            renderingConfig: {
+                hiResOutputToSeparateFiles: false,
+                defaultHiResOuputRendering: {
+                    fileFormat: "pdf",
+                    dpi: 300
+                }
+            }
+        };
+
+block prepend SCRIPT_WEBAPI_REQUEST
+    .    
+        const previewRequestBody = {
+            previewOptions: previewOptions,
+            productDefinitions: [templateData],
+            itemsData: items 
+        }
+
+        const printfileRequestBody = {
+            hiResOptions: previewOptions,
+            productDefinitions: [templateData],
+            itemsData: items 
+        }
+
+block SCRIPT_WEBAPI_DOREQUEST
+    .    
+        document.getElementById("finish").removeAttribute("disabled");
+        document.getElementById('finish').addEventListener('click', async () => {
+            let response = await RequestToApi(`${baseUrl}api/HiRes/GenerateHiRes`, printfileRequestBody);
+            console.log("GenerateHiRes returned this structure: ", response);
+            download(response[0].HiResUrls[0]);
+        });
+
+        let response = await RequestToApi(`${baseUrl}api/Preview/GeneratePreview`, previewRequestBody);
+        document.getElementById("preview").src = response[0][0][0];

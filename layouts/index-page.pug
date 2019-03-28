@@ -1,0 +1,26 @@
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+
+        block HEAD_CONTENT
+ 
+        link(rel="stylesheet" href="assets/demo.css")
+        title Customer's Canvas Code Examples
+    body
+        header.header
+            div.header__section.header__section-logo
+                a(href="https://customerscanvas.com" target="_blank")
+                    img.header__logo(src="assets/logo.svg" alt="logo")
+        main.main
+            each sampleGroup in groups
+                div
+                    h2= sampleGroup.group
+                    div
+                        each sample in sampleGroup.samples
+                            h3
+                                a(href= sample.output)= sample.title
+                            div= sample.description
+
+

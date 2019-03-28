@@ -1,0 +1,94 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="../assets/demo.css" />
+    <title>Preview images of different sizes</title>
+    <meta name="description" content="Demonstrates how to save a personalized image as a state file and return preview URLs of multiple sizes." />
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__section header__section-logo"><a href="https://customerscanvas.com" target="_blank"><img class="header__logo" src="../assets/logo.svg" alt="logo" /></a></div>
+    </header>
+    <main class="main">
+        <!-- See this article for details: 
+https://customerscanvas.com/docs/cc/web-api-for-rendering.htm
+-->
+        <div> <img id="preview1" style="display: block" /><img id="preview2" style="display: block" /><img id="preview3" style="display: block" /></div>
+        <div id="message"></div>
+        <div id="securityError" style="display:none">
+            <h2>HTTP 403 Error</h2>
+            <div>Most likely it is caused by one of two reasons:</div>
+            <ul>
+                <li>Requests are done through HTTP, not HTTPS</li>
+                <li>No security key is provided or it is not the same as in Customer's Canvas settings</li>
+            </ul>
+            <div> You can address both issues by editing the <a href="https://customerscanvas.com/docs/cc/authsettings-config.htm">AuthSettings.config </a>file . </div>
+            <div id="moreInfo"></div>
+        </div>
+    </main>
+    <script src="../assets/helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const baseUrl = "https://192.168.137.10/cc/5.0-beta/";
+            const apiKey = "CustomerSecurityKey";
+            console.warn("IMPORTANT! Expose API Key on a client only on dev machine. For a production version, you should change your code for server-to-server requests only or turn off authorization in AuthSettings.config file.");
+            const RequestToApi = async (url, body) => {
+                let response = await fetch(url, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CustomersCanvasApiKey": apiKey ? apiKey : ""
+                    },
+                    body: JSON.stringify(body)
+                });
+                if (!response.ok) throw response;
+                return response.json();
+            }
+
+            try {
+                const userId = "test-user";
+                const response = await RequestToApi(`${baseUrl}api/HiRes/GenerateHiRes`, {
+                    userId: userId,
+                    productDefinitions: [{
+                        "surfaces": ["samples/name-photo"]
+                    }],
+                    itemsData: {
+                        "First Name": {
+                            text: "Mary"
+                        },
+                        "Last Name": {
+                            text: "Kleinwitz"
+                        },
+                        "Photo": {
+                            "image": "public:samples/photos/01.jpg",
+                            "contentResizeMode": "Fill"
+                        }
+                    }
+                });
+
+                const stateId = response[0].StateId;
+                const size1 = 320,
+                    size2 = 640,
+                    size3 = 1280;
+                document.getElementById("preview1").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size1}x${size1}].jpg`;
+                document.getElementById("preview2").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size2}x${size2}].jpg`;
+                document.getElementById("preview3").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size3}x${size3}].jpg`;
+
+            } catch (serverResponse) {
+                let error = await serverResponse.text();
+                if (serverResponse.status == 403) {
+                    document.getElementById("securityError").style.display = "block";
+                    document.getElementById("moreInfo").innerText = `Additional info: ${error}`;
+                } else {
+                    document.getElementById("message").innerText = error;
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

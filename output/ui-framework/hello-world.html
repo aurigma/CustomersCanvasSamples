@@ -1,0 +1,89 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js"></script>
+    <link rel="stylesheet" href="../assets/demo.css" />
+    <title>Hello World</title>
+    <meta name="description" content="A &quot;Hello world&quot; example of the UI Framework configuration. To make it useful, just insert more complicated config without changing the code." />
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__section header__section-logo"><a href="https://customerscanvas.com" target="_blank"><img class="header__logo" src="../assets/logo.svg" alt="logo" /></a></div>
+    </header>
+    <main class="main">
+        <div id="editor-parent" style="width: 100%;height:calc(100vh - 40px);"></div>
+    </main>
+    <script src="../assets/helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const product = {
+                id: 0,
+                sku: "PRODUCT-001",
+                name: "Test Product",
+                description: "This is a test product.",
+                options: [],
+                price: 1,
+                attributes: []
+            };
+            /* See https://customerscanvas.com/support/ui-framework/readme.md for the syntax explanation and widget reference. */
+            // This is just a minimal "Hello World" configuration of UI Framework. 
+            // See the configs folder for more examples of configs. 
+            const config = {
+                "showSteps": false,
+                "widgets": [{
+                    "name": "text",
+                    "type": "static-text",
+                    "params": {
+                        "text": "Hello world"
+                    }
+                }],
+                "steps": [{
+                    "name": "main",
+                    "mainPanel": {
+                        "name": "text"
+                    }
+                }]
+            }
+            require.config({
+                baseUrl: '',
+                paths: {
+                    "ecommerce-driver": "https://cdn.jsdelivr.net/npm/@aurigma/ui-framework/dist/driver",
+                    "uiframework": "https://cdn.jsdelivr.net/npm/@aurigma/ui-framework/dist/editor"
+                }
+            });
+
+            //  Here you are supposed to specify the URL to "ecommerce-driver.js", to your "multistep-editor" folder,  to "config.json" file 
+            require(['ecommerce-driver', 'uiframework'], function(driver, editor) {
+
+                const quantity = 1;
+                const settings = {
+                    customersCanvasBaseUrl: "https://192.168.137.10/cc/5.0-beta/"
+                };
+                const user = {
+                    id: "test-user"
+                };
+
+                // Initialization - you should provide us with a product definition, editor instance, 
+                // config, data returned by the editor, items quantity (when it is necessary).
+                var ecommerce = driver.init(product, editor, config, settings, null, quantity, user);
+
+                // Display the editor in the specified div element
+                ecommerce.products.current.renderEditor(document.getElementById("editor-parent"));
+
+                // Subscribe an event which will be called when the user finishes editing (you are supposed to put a code which
+                // sends the product to a shopping cart).
+                ecommerce.orders.current.onSubmitting.subscribe(data => console.log("submitting", data));
+                ecommerce.orders.current.onSubmitted.subscribe(function(data) {
+                    // It contains the stateId, userId, preview images and the other output data.
+                    console.log(data);
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

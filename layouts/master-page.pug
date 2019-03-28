@@ -1,0 +1,26 @@
+html(lang="en")
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1.0")
+        meta(http-equiv="X-UA-Compatible", content="ie=edge")
+
+        block HEAD_CONTENT
+ 
+        link(rel="stylesheet" href="../assets/demo.css")
+        title= title
+        meta(name="description" content= description)
+    body
+        header.header
+            div.header__section.header__section-logo
+                a(href="https://customerscanvas.com" target="_blank")
+                    img.header__logo(src="../assets/logo.svg" alt="logo")
+            block ACTION_BUTTONS
+        main.main
+            block BODY_CONTENT
+
+        script(src="../assets/helper.js")
+        script
+            | document.addEventListener('DOMContentLoaded', async () => {
+            block SCRIPT_LOADED 
+            |    });
+

@@ -1,0 +1,16 @@
+extends ../../layouts/std-web-api.pug
+
+block append SCRIPT_WEBAPI_INIT
+    .
+
+        let items = {
+            "First Name": { text: "Danny" },
+            "Last Name": { text: "Waldman" },
+            "Photo": { "image": "public:samples/photos/02.jpg", "contentResizeMode": "Fill" }
+        };
+
+        let templateData = {
+            surfaces: [
+                "samples/name-photo"
+            ]
+        };

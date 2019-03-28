@@ -1,0 +1,33 @@
+extends ../../layouts/web-api
+
+block BODY_PREVIEW_SECTION   
+    div      
+        img(id='preview1' style="display: block")
+        img(id='preview2' style="display: block")
+        img(id='preview3' style="display: block")
+
+block SCRIPT_WEBAPI_DOREQUEST    
+    .
+        const userId = "test-user";
+        const response = await RequestToApi(`${baseUrl}api/HiRes/GenerateHiRes`, {
+            userId: userId,
+            productDefinitions: [{"surfaces": ["samples/name-photo"]}],
+            itemsData: {
+                "First Name": {
+                    text: "Mary"
+                },
+                "Last Name": {
+                    text: "Kleinwitz"
+                },
+                "Photo": {
+                    "image": "public:samples/photos/01.jpg",
+                    "contentResizeMode": "Fill"
+                }
+            }
+        });
+
+        const stateId = response[0].StateId;
+        const size1 = 320, size2 = 640, size3=1280;
+        document.getElementById("preview1").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size1}x${size1}].jpg`;
+        document.getElementById("preview2").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size2}x${size2}].jpg`;
+        document.getElementById("preview3").src = `${baseUrl}/api/Rendering/GetProofImage/${userId}/${stateId}/0_0[${size3}x${size3}].jpg`;

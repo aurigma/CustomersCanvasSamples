@@ -1,0 +1,98 @@
+extends ../../layouts/std-iframe-api.pug
+
+block prepend SCRIPT_LOADED
+    .
+
+        // See https://customerscanvas.com/docs/cc/asset-manager.htm for details
+
+        /* 
+           For custom JS source, we need to build a structure like: 
+
+           {
+               "name": "string",
+               "assets": [ {"title": "string", "preview": "url to thumbnail", "source": "url to original"} ],
+               "categories": [ {the same object}, {the same object} ]
+           } 
+
+           The code which generates it may look like this
+        */
+        let getCategory = (name, category) => ({ 
+            "name": name, 
+            "assets": getAssetsFrom(name), 
+            "categories": category 
+        });
+
+        let getAssetsFrom = (category) => {
+            switch(category) {
+                case "Food": 
+                    return [
+                        {"title": "Food 1", "preview": "https://lorempixel.com/200/200/food/1/", "source": "https://lorempixel.com/800/800/food/1/"},
+                        {"title": "Food 2", "preview": "https://lorempixel.com/200/200/food/5/", "source": "https://lorempixel.com/800/800/food/5/"}
+                    ];
+                case "More Food": 
+                    return [
+                        {"title": "Food 3", "preview": "https://lorempixel.com/200/200/food/3/", "source": "https://lorempixel.com/800/800/food/3/"},
+                        {"title": "Food 4", "preview": "https://lorempixel.com/200/200/food/4/", "source": "https://lorempixel.com/800/800/food/4/"}
+                    ];
+                case "Cats": 
+                    return [
+                        {"title": "Cat 1", "preview": "https://lorempixel.com/200/200/cats/1/", "source": "https://lorempixel.com/800/800/cats/1/"},
+                        {"title": "Cat 2", "preview": "https://lorempixel.com/200/200/cats/2/", "source": "https://lorempixel.com/800/800/cats/2/"}
+                    ];
+                default: 
+                    return [
+                        {"title": "Item 1", "preview": "http://lorempixel.com/200/200/abstract/1/", "source": "http://lorempixel.com/800/800/abstract/1/"},
+                        {"title": "Item 2", "preview": "http://lorempixel.com/200/200/abstract/5/", "source": "http://lorempixel.com/800/800/abstract/5/"}
+                    ];
+            }
+        };
+
+        let product = {            
+            "surfaces": [ "samples/test-page" ]    
+        };
+
+        let config = {
+            "initialMode": "Advanced",
+            "defaultAssetSelectWidget": "AssetManager",
+            "assetSources": {
+                /* User uploads */
+                "Uploads": {
+                    "type": "PrivateSource",
+                    "allowedExtensions": [ "jpg", "jpeg", "png", "pdf", "ai", "tif", "psd", "svg" ]
+                },
+                "Image Library": {
+                    "type": "PublicSource",
+                    "allowedExtensions": [ "jpg", "jpeg", "png", "pdf", "ai", "tif", "psd", "svg" ],
+                    "rootCategory": {
+                        "name": "samples"
+                    }                    
+                },
+                /* Custom assets from JS using some code which returns  */
+                "From JS": {
+                    "type": "MemorySource",
+                    "rootCategory": getCategory("", [getCategory("Cats"), getCategory("Food", [getCategory("More Food")])])                     
+                }
+            },
+            "widgets": {
+                "AssetManager": {
+                    "tabs": [{
+                        "name": "My uploads",
+                        "assetSourceInstance": "Uploads",
+                        "iconClassName": "cc-icon-uploadable",
+                        "controls": {
+                            "assetNameEnabled": false
+                        }                            
+                    }, {
+                        "name": "Image Library",
+                        "assetSourceInstance": "Image Library",
+                        "iconClassName": "cc-icon-add-image"                            
+                    }, {
+                        "name": "From JS",
+                        "assetSourceInstance": "From JS",
+                        "iconClassName": "cc_icon_layout"
+                    }]   
+                }
+            }
+        };
+
+    

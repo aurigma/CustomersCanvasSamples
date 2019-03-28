@@ -1,0 +1,167 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <!---->
+    <!-- INSERT CUSTOMER'S CANVAS URL HERE!-->
+    <!-- To the base URL of your CC instance add Resources/Generated/IframeApi.js -->
+    <script type="text/javascript" id="CcIframeApiScript" src="https://192.168.137.10/cc/5.0-beta/Resources/Generated/IframeApi.js"> </script><!-- -->
+    <link rel="stylesheet" href="../assets/demo.css" />
+    <title>Asset Manager Demo</title>
+    <meta name="description" content="Here you can see different settings for the Asset Manager module - user uploads, Customer's Canvas image library (public gallery), custom asset sources" />
+</head>
+
+<body>
+    <header class="header">
+        <div class="header__section header__section-logo"><a href="https://customerscanvas.com" target="_blank"><img class="header__logo" src="../assets/logo.svg" alt="logo" /></a></div>
+        <div class="header__section header__section-button"><button class="header__button" id="finish" disabled="disabled">Download PDF</button></div>
+    </header>
+    <main class="main">
+        <div class="main__section main__section-iframe">
+            <div class="main__iframe"><iframe id="editorFrame"></iframe></div>
+        </div>
+        <div class="main__section main__section-version">
+            <div class="main__version" id="version-box">ver.
+            </div>
+        </div>
+    </main>
+    <script src="../assets/helper.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => { // See https://customerscanvas.com/docs/cc/asset-manager.htm for details
+
+            /* 
+               For custom JS source, we need to build a structure like: 
+
+               {
+                   "name": "string",
+                   "assets": [ {"title": "string", "preview": "url to thumbnail", "source": "url to original"} ],
+                   "categories": [ {the same object}, {the same object} ]
+               } 
+
+               The code which generates it may look like this
+            */
+            let getCategory = (name, category) => ({
+                "name": name,
+                "assets": getAssetsFrom(name),
+                "categories": category
+            });
+
+            let getAssetsFrom = (category) => {
+                switch (category) {
+                    case "Food":
+                        return [{
+                                "title": "Food 1",
+                                "preview": "https://lorempixel.com/200/200/food/1/",
+                                "source": "https://lorempixel.com/800/800/food/1/"
+                            },
+                            {
+                                "title": "Food 2",
+                                "preview": "https://lorempixel.com/200/200/food/5/",
+                                "source": "https://lorempixel.com/800/800/food/5/"
+                            }
+                        ];
+                    case "More Food":
+                        return [{
+                                "title": "Food 3",
+                                "preview": "https://lorempixel.com/200/200/food/3/",
+                                "source": "https://lorempixel.com/800/800/food/3/"
+                            },
+                            {
+                                "title": "Food 4",
+                                "preview": "https://lorempixel.com/200/200/food/4/",
+                                "source": "https://lorempixel.com/800/800/food/4/"
+                            }
+                        ];
+                    case "Cats":
+                        return [{
+                                "title": "Cat 1",
+                                "preview": "https://lorempixel.com/200/200/cats/1/",
+                                "source": "https://lorempixel.com/800/800/cats/1/"
+                            },
+                            {
+                                "title": "Cat 2",
+                                "preview": "https://lorempixel.com/200/200/cats/2/",
+                                "source": "https://lorempixel.com/800/800/cats/2/"
+                            }
+                        ];
+                    default:
+                        return [{
+                                "title": "Item 1",
+                                "preview": "http://lorempixel.com/200/200/abstract/1/",
+                                "source": "http://lorempixel.com/800/800/abstract/1/"
+                            },
+                            {
+                                "title": "Item 2",
+                                "preview": "http://lorempixel.com/200/200/abstract/5/",
+                                "source": "http://lorempixel.com/800/800/abstract/5/"
+                            }
+                        ];
+                }
+            };
+
+            let product = {
+                "surfaces": ["samples/test-page"]
+            };
+
+            let config = {
+                "initialMode": "Advanced",
+                "defaultAssetSelectWidget": "AssetManager",
+                "assetSources": {
+                    /* User uploads */
+                    "Uploads": {
+                        "type": "PrivateSource",
+                        "allowedExtensions": ["jpg", "jpeg", "png", "pdf", "ai", "tif", "psd", "svg"]
+                    },
+                    "Image Library": {
+                        "type": "PublicSource",
+                        "allowedExtensions": ["jpg", "jpeg", "png", "pdf", "ai", "tif", "psd", "svg"],
+                        "rootCategory": {
+                            "name": "samples"
+                        }
+                    },
+                    /* Custom assets from JS using some code which returns  */
+                    "From JS": {
+                        "type": "MemorySource",
+                        "rootCategory": getCategory("", [getCategory("Cats"), getCategory("Food", [getCategory("More Food")])])
+                    }
+                },
+                "widgets": {
+                    "AssetManager": {
+                        "tabs": [{
+                            "name": "My uploads",
+                            "assetSourceInstance": "Uploads",
+                            "iconClassName": "cc-icon-uploadable",
+                            "controls": {
+                                "assetNameEnabled": false
+                            }
+                        }, {
+                            "name": "Image Library",
+                            "assetSourceInstance": "Image Library",
+                            "iconClassName": "cc-icon-add-image"
+                        }, {
+                            "name": "From JS",
+                            "assetSourceInstance": "From JS",
+                            "iconClassName": "cc_icon_layout"
+                        }]
+                    }
+                }
+            };
+            document.getElementById("version-box").innerText = "version " + CustomersCanvas.VERSION;
+
+            // Customer's Canvas is loaded with this line. See the JSON objects above for params.
+            var editor = await CustomersCanvas.IframeApi.loadEditor(
+                document.getElementById("editorFrame"), product, config);
+
+            document.getElementById("finish").removeAttribute("disabled");
+            document.getElementById('finish').addEventListener('click', async () => {
+                let result = await editor.finishProductDesign();
+                console.log("finishProductDesign returned this structure: ", result);
+                download(result.hiResOutputUrls[0]);
+            });
+        });
+    </script>
+</body>
+
+</html>

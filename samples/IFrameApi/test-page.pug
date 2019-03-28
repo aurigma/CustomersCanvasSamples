@@ -1,0 +1,29 @@
+extends ../../layouts/std-iframe-api.pug
+
+block prepend SCRIPT_LOADED
+    .
+        let product = {            
+        "surfaces": [
+                {
+                    "printAreas": [
+                        {
+                            "designFile": "samples/test-page",
+                            "designLocation": {
+                                "X": "36",
+                                "Y": "36"
+                            }
+                        }
+                    ],
+                    "mockup": {
+                        "down": "samples/test-page"
+                    }
+                }
+            ]    
+        };
+
+        let config = {
+            "autoLoadUserInfo": true,
+            "userInfo": {
+                "Image": "public:samples/test-page/Image.jpg"
+            }
+        };

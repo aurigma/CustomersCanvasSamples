@@ -1,0 +1,47 @@
+[
+    {
+        "group": "IFrame API",
+        "samples": [
+            {
+                "title": "Test page",
+                "description": "You may use this page to try if Customer's Canvas is set up properly. It is also a great quick start",
+                "template": "samples/iframeapi/test-page.pug",
+                "output": "IFrameApi/test-page.html"
+            },
+            {
+                "title": "Asset Manager Demo",
+                "description": "Here you can see different settings for the Asset Manager module - user uploads, Customer's Canvas image library (public gallery), custom asset sources",
+                "template": "samples/iframeapi/asset-manager.pug",
+                "output": "IFrameApi/asset-manager.html"
+            }
+        ]
+    },
+    {
+        "group": "Personalization Web API",
+        "samples": [
+            {
+                "title": "Quick start",
+                "description": "A simple example of Web API usage",
+                "template": "samples/webapi/quick-start.pug",
+                "output": "WebApi/quick-start.html"
+            },
+            {
+                "title": "Preview images of different sizes",
+                "description": "Demonstrates how to save a personalized image as a state file and return preview URLs of multiple sizes.",
+                "template": "samples/webapi/multiple-sizes.pug",
+                "output": "WebApi/multiple-sizes.html"
+            }            
+        ]
+    },
+    {
+        "group": "UI Framework",
+        "samples": [
+            {
+                "title": "Hello World",
+                "description": "A \"Hello world\" example of the UI Framework configuration. To make it useful, just insert more complicated config without changing the code.",
+                "template": "samples/ui-framework/hello-world.pug",
+                "output": "ui-framework/hello-world.html"
+            }           
+        ]
+    } 
+]

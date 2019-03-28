@@ -1,0 +1,59 @@
+extends master-page
+
+block HEAD_CONTENT
+    script(src='https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js')
+
+block BODY_CONTENT
+    div(id="editor-parent" style="width: 100%;height:calc(100vh - 40px);")
+
+block SCRIPT_LOADED
+    
+    block PRODUCT
+        .
+            const product = {
+                id: 0,
+                sku: "PRODUCT-001",
+                name: "Test Product",
+                description: "This is a test product.",
+                options: [],
+                price: 1,
+                attributes: []
+            }; 
+
+    block CONFIG
+        .
+            /* See https://customerscanvas.com/support/ui-framework/readme.md for the syntax explanation and widget reference. */ 
+
+    block LOAD_EDITOR
+        .
+            require.config({
+                baseUrl: '',
+                paths: {
+                    "ecommerce-driver": "#{settings.uiFramework.ecommerceDriverUrl}", 
+                    "uiframework": "#{settings.uiFramework.editorLoaderUrl}"
+                }
+            });
+
+            //  Here you are supposed to specify the URL to "ecommerce-driver.js", to your "multistep-editor" folder,  to "config.json" file 
+            require(['ecommerce-driver', 'uiframework'], function (driver, editor) {
+
+                const quantity = 1;
+                const settings = { customersCanvasBaseUrl: "#{settings.customersCanvas.baseUrl}" };
+                const user = { id: "test-user" };
+
+                // Initialization - you should provide us with a product definition, editor instance, 
+                // config, data returned by the editor, items quantity (when it is necessary).
+                var ecommerce = driver.init(product, editor, config, settings, null, quantity, user);
+
+                // Display the editor in the specified div element
+                ecommerce.products.current.renderEditor(document.getElementById("editor-parent"));
+
+                // Subscribe an event which will be called when the user finishes editing (you are supposed to put a code which
+                // sends the product to a shopping cart).
+                ecommerce.orders.current.onSubmitting.subscribe(data => console.log("submitting", data));
+                ecommerce.orders.current.onSubmitted.subscribe(function (data) {
+                    // It contains the stateId, userId, preview images and the other output data.
+                    console.log(data);
+                });
+            });
+

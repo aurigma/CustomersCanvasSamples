@@ -1,0 +1,57 @@
+extends master-page
+
+block BODY_CONTENT
+    // 
+      See this article for details: 
+      https://customerscanvas.com/docs/cc/web-api-for-rendering.htm
+
+    block BODY_PREVIEW_SECTION        
+        img(id='preview')
+
+    div(id='message')
+    div(id='securityError' style='display:none')
+        h2 HTTP 403 Error
+        div Most likely it is caused by one of two reasons:
+        ul 
+            li Requests are done through HTTP, not HTTPS
+            li No security key is provided or it is not the same as in Customer's Canvas settings
+        div 
+            |You can address both issues by editing the 
+            a(href='https://customerscanvas.com/docs/cc/authsettings-config.htm') AuthSettings.config 
+            | file .  
+        div(id='moreInfo')
+
+block SCRIPT_LOADED 
+
+    block SCRIPT_WEBAPI_INIT
+        . 
+            const baseUrl = "#{settings.customersCanvas.baseUrl}";
+            const apiKey = "#{settings.customersCanvas.apiKey}";
+            console.warn("IMPORTANT! Expose API Key on a client only on dev machine. For a production version, you should change your code for server-to-server requests only or turn off authorization in AuthSettings.config file.");
+
+    block SCRIPT_WEBAPI_REQUEST
+        
+            | const RequestToApi = async (url, body) => {
+            |    let response = await fetch(url, {
+            |        method: "POST",
+            |        headers: { "Content-Type": "application/json", "X-CustomersCanvasApiKey": apiKey ? apiKey : "" },
+            |        body: JSON.stringify(body)
+            |    });
+            |    if (!response.ok) throw response;
+            |    return response.json(); 
+            | }
+            |
+            | try {
+            |
+            block SCRIPT_WEBAPI_DOREQUEST
+            |
+            |
+            | } catch(serverResponse) {
+            |    let error = await serverResponse.text();
+            |    if (serverResponse.status == 403) {
+            |        document.getElementById("securityError").style.display = "block";
+            |        document.getElementById("moreInfo").innerText = `Additional info: ${error}`; 
+            |    } else {
+            |        document.getElementById("message").innerText = error;
+            |    }                
+            | }

@@ -1,0 +1,35 @@
+{
+  "name": "@aurigma/customerscanvassamples",
+  "version": "1.0.0",
+  "description": "Code examples for Customer's Canvas SDK",
+  "dependencies": {
+    "@types/fs-extra": "^5.0.5",
+    "@types/serve-static": "^1.13.2",
+    "fs-extra": "^7.0.1",
+    "js-beautify": "^1.9.0",
+    "pug": "^2.0.3",
+    "serve-static": "^1.13.2"
+  },
+  "devDependencies": {
+    "@types/finalhandler": "0.0.33",
+    "@types/js-beautify": "^1.8.0",
+    "@types/node": "^11.11.3",
+    "@types/pug": "^2.0.4",
+    "finalhandler": "^1.1.1",
+    "nodemon": "^1.18.10",
+    "pug-cli": "^1.0.0-alpha6",
+    "ts-node": "^8.0.3",
+    "typescript": "^3.3.3333"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ts-node index.ts",
+    "start": "nodemon --ext ts,pug,json,js,css --exec ts-node index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://tfs/tfs/CC_Collection/CustomersCanvas/_git/CustomersCanvasSamples"
+  },
+  "author": "Andrew Simontsev",
+  "license": "SEE LICENSE IN License.md"
+}
